@@ -31,18 +31,53 @@ class _HomePageState extends State<HomePage> {
             child: FutureBuilder(
               future: notesList,
                 builder: (context,AsyncSnapshot<List<NotesModel>> snapshot){
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                    itemBuilder: (context,index){
-                  return Card(
-                    child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
-                      title: Text(snapshot.data![index].title.toString()),
-                      subtitle: Text(snapshot.data![index].age.toString()),
-                      trailing: Text(snapshot.data![index].email.toString()),
-                    ),
-                  );
-                });
+                if(snapshot.hasData){
+                  return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context,index){
+                        return InkWell(
+                          onTap: (){
+                            dbHelper!.update(
+                              NotesModel(
+                                id: snapshot.data![index].id,
+                                  title: 'First Flitter note',
+                                  age: 11,
+                                  description: 'let me take to you tommorw',
+                                  email: 'shahabmustafa57@gmail.com',
+                              ),
+                            );
+                            setState(() {
+                              notesList = dbHelper!.getNotesList();
+                            });
+                          },
+                          child: Dismissible(
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              color: Colors.red,
+                              child: Icon(Icons.delete),
+                            ),
+                            onDismissed: (DismissDirection direction){
+                              setState(() {
+                                dbHelper!.Delete(snapshot.data![index].id!);
+                                notesList = dbHelper!.getNotesList();
+                                snapshot.data!.remove(snapshot.data![index]);
+                              });
+                            },
+                            key: ValueKey<int>(snapshot.data![index].id!),
+                            child: Card(
+                              child: ListTile(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+                                title: Text(snapshot.data![index].title.toString()),
+                                subtitle: Text(snapshot.data![index].age.toString()),
+                                trailing: Text(snapshot.data![index].email.toString()),
+                              ),
+                            ),
+                          ),
+                        );
+                      });
+                }else{
+                  return CircularProgressIndicator();
+                }
             }),
           )
 
@@ -52,13 +87,16 @@ class _HomePageState extends State<HomePage> {
         onPressed: (){
           dbHelper!.insert(
             NotesModel(
-                title: 'Shahab Mustafa',
+                title: 'Shahab Khan',
                 age: 21,
                 description: 'I am Flutter Developer',
-                email: 'shahabmustafa57@gmail.com',
+                email: 'shahab57@gmail.com',
             ),
           ).then((value){
             print('Data Add');
+            setState(() {
+              notesList = dbHelper!.getNotesList();
+            });
           }).onError((error, stackTrace){
             print('Error :${error.toString()}');
           });
