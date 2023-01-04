@@ -42,6 +42,7 @@ class DBHelper{
         NotesModel.fromMap(e)
     ).toList();
   }
+
   Future<int> Delete(int id)async{
     var dbClient = await db;
     return await dbClient!.delete(

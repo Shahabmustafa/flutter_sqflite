@@ -66,7 +66,6 @@ class _HomePageState extends State<HomePage> {
                             key: ValueKey<int>(snapshot.data![index].id!),
                             child: Card(
                               child: ListTile(
-                                contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
                                 title: Text(snapshot.data![index].title.toString()),
                                 subtitle: Text(snapshot.data![index].age.toString()),
                                 trailing: Text(snapshot.data![index].email.toString()),
